@@ -12,7 +12,7 @@
 
 
 
-# 动态绑定— 态
+# 动态绑定—多态
 
 ​	**动态绑定使得程序的可扩展性达到了最好**
 
@@ -64,8 +64,6 @@ public class Action{
 
 
 
-# 反射
-
 
 
 
@@ -116,3 +114,171 @@ Java定义了4个标准的meta-annotation类型，被用来提供对其他annota
 ### @Inherited
 
 表示某个被标注的类型是被继承的，如果一个使用好了@Inherited注解修饰的annotation类型被用于一个Class，则这个annotation也被用于该class的子类
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# SpringBoot
+
+## 启动类
+
+@SpringBootApplication相当于
+
++ @Configuration（@SpringBootConfiguration点开查看发现里面还是应用了@Configuration）
++ @EnableAutoConfiguration
++ @ComponentScan
+
+### @Configuration
+
++ 之前Spring的配置如下:
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+       default-lazy-init="true">
+    <!--bean定义-->
+    <bean id="userService" class="..UserServiceImpl">
+    	...
+	</bean>
+</beans>
+```
+
++ 基于JavaConfig的配置：
+
+```
+@Configuration
+public class DemoConfiguration{
+    //bean定义
+    @Bean
+    public UserService userService(){
+        return new UserServiceImpl();
+    }
+}
+```
+
+**任何一个标注了@Bean的方法，其返回值将作为一个bean定义并注册到Spring的IoC容器，方法名将默认成该bean定义的id**
+
+### @ComponentScan
+
+自动扫描并加载**符合条件**的组件，如@Component、@Repository和其他定义的bean，并将这些beans定义加载到Ioc容器。
+
+![@EnableAutoConfiguration组件示意图](/Users/walker/notebook/note/pic/@EnableAutoConfiguration组件示意图.png)
+
+可以通过basePackages等属性来细粒度定制该注解自动扫描的范围，如果不指定，框架会从声明@ComponentScan注解所在类的package进行扫描（这也是为什么默认情况下启动类在root package）
+
+###@EnableAutoConfiguration
+
+借助@Import的支持，手机和注册特定场景相关的bean定义
+
+***@EnableAutoConfiguration也是借助@Import的帮助，将所有符合自动配置条件的bean定义加载到IoC容器***
+
+@EnableAutoConfiguration注解中，最关键的要属`@Import(EnableAutoConfigurationImportSelector.class)`，借助EnableAutoConfigurationImportSelector，@EnableAutoConfiguration可以帮助SpringBoot应用将所有符合条件的@Configuration配置都加载到当前SpringBoot创建并使用的IoC容器
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 公司Java内部服务流程
+
+![公司Java服务流程](/Users/walker/notebook/note/pic/公司Java服务流程.png)
+
+## 目前用到的公共组件
+
++ RabbitMQ
++ Memcached：Java中先从cache中获取数据，如果为空，则空DB获取，然后再写到cache中，如findById源码
++ JSON
++ RPC
++ RabbitMQ：MQ采用exchange的type默认为direct，即只通过routingkey将msg发送到对应的Queue，Queue的建立是由消费者决定的，两端只需要协调routingkey即可
++ JdbcDAO
++ Scheduled：马上用到，处理定时任务，用到MQ，使用@TaskService和@TaskMethod确定
+
+## 服务流程
+
+### 请求处理
+
+通过@RestController和@xxxMappting确定SpringMVC接收HTTP请求，然后核心控制器拦截并分发请求，Controller调用Service处理。
+
+![SpringMVC工作原理](/Users/walker/notebook/note/pic/SpringMVC工作原理.png)
+
+### Ioc容器
+
+控制反转（依赖注入）ioc，di，aop，控制bean的生命周期
+
+### JDBCTemplate
+
+公司框架没有用到类似于Hibernate、Mybatis这些框架
+
+Spring中关于JDBC的一个辅助类JDBCTemplate，封装了原生的JDBC,可以较为方便的进行数据库操作
+
+Spring提供了JdbcDaoSupport支持类，所有DAO继承这个类，就会自动获得JdbcTemplate（前提是注入DataSource）
+
+```java
+// 简单查询，按照ID查询，返回字符串	
+public String searchUserName(int id) {
+    String sql = "select username from user where id=?";	
+    // 返回类型为String(String.class)
+    return this.getJdbcTemplate().queryForObject(sql, String.class, id);
+}
+```
+
++ Spring 为每种持久化技术 提供一个支持类，在DAO 中注入 模板工具类
+  * JDBC ：	org.springframework.jdbc.core.support.JdbcDaoSupport
+  * Hibernate 3.0 ：org.springframework.orm.hibernate3.support.HibernateDaoSupport
+  * MyBatis ：org.springframework.orm.ibatis.support.SqlMapClientDaoSupport
++ SptingBoot中直接注入JDBCTemplate也可以实现对数据库的访问：
+
+```
+@Service
+public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Override
+    public void create(String name, Integer age) {
+        jdbcTemplate.update("insert into USER(NAME, AGE) values(?, ?)", name, age);
+    }
+
+    @Override
+    public void deleteByName(String name) {
+        jdbcTemplate.update("delete from USER where NAME = ?", name);
+    }
+
+    @Override
+    public Integer getAllUsers() {
+        return jdbcTemplate.queryForObject("select count(1) from USER", Integer.class);
+    }
+
+    @Override
+    public void deleteAllUsers() {
+        jdbcTemplate.update("delete from USER");
+    }
+}
+```
+
++ 公司的JdbcDAO组件在封装了JDBCTemplate，并在基础上丰富了操作数据库的方法；另一方面，JdbcDAO中调用相关操作方法时，会对组装SQL语句；也可以自己手动写类似于连表查询等这种湘桂灵活的SQL语句。
