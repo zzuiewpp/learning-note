@@ -117,7 +117,35 @@ Java定义了4个标准的meta-annotation类型，被用来提供对其他annota
 
 表示某个被标注的类型是被继承的，如果一个使用好了@Inherited注解修饰的annotation类型被用于一个Class，则这个annotation也被用于该class的子类
 
+## Java中常用到的注解
 
+### Spring
+
+### 组件类注解
+
+三个有具体语义的注解被@Component注解标注，所以可以代替，但是在开发中尽量使用带有具体语义的注解
+
+```java
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Component
+public @interface Controller {
+    String value() default "";
+}
+```
+
++ @Component：标注一个普通的Spring bean类；
+
++ @Controller：标注一个控制器组件类；
++ @Service：标注一个业务逻辑组件类；
++ @Repository：标注一个DAO组件类，如impl；
+
+### 装配bean时常用到的注解
+
+
+
+### 
 
 
 
