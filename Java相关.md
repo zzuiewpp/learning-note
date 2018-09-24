@@ -117,11 +117,11 @@ Java定义了4个标准的meta-annotation类型，被用来提供对其他annota
 
 表示某个被标注的类型是被继承的，如果一个使用好了@Inherited注解修饰的annotation类型被用于一个Class，则这个annotation也被用于该class的子类
 
-## Java中常用到的注解
+## Spring中常用到的注解
 
 ### Spring
 
-### 组件类注解
+#### 组件类注解
 
 三个有具体语义的注解被@Component注解标注，所以可以代替，但是在开发中尽量使用带有具体语义的注解
 
@@ -139,13 +139,60 @@ public @interface Controller {
 
 + @Controller：标注一个控制器组件类；
 + @Service：标注一个业务逻辑组件类；
-+ @Repository：标注一个DAO组件类，如impl；
++ @Repository：标注一个DAO组件类，如impl
 
-### 装配bean时常用到的注解
+#### 装配bean时常用到的注解
+
++ @Autowired：属于Spring
++ @Resource：属于J2EE
+
+两者的区别：
+
++ @Resource可以代替@Autowired；
++ @Autowired按照类型进行装配；
++ @Resource有两个关键属性，name和type，如果没有指定name和type，则容器使用属性的名称作为默认name在容器中查找依赖，若没找到，则会根据type进行查找；如果指定了name，则只会根据name在容器中装配，推荐使用@Resource
+
+### Spring MVC
+
++ @Controller：表明该类会作为与前端作交互的控制层组件，通过服务接口定义的提供访问应用程序的一种行为，解释用户的输入，将其转换成一个模型然后将试图呈献给用户；
+
++ @RequestMapping：用于将url映射到整个处理类或者特定的处理请求的方法；
+
++ @RequestParam：默认情况下，required=true，也就是改参数必须要传。如果改参数可以传可不传，可以配置required=false；
+
++ @RequestBody：指方法参数应该被绑定到HTTP请求Body上；
+
++ @ResponseBody：与@RequestBody类似，它的作用是将返回类型直接输入到HTTP response body中；
+
++ @RestController：控制器实现了REST的API，只为服务于JSON，XML或其它自定义的类型内容，继承自@Controller注解，来标识当前类是一个控制器servlet，告诉Spring以字符串形式渲染结果，并直接返回给调用者；
+
+  本文来自 走过程序员的路 的CSDN 博客 ，全文地址请点击：https://blog.csdn.net/lafengwnagzi/article/details/53034369?utm_source=copy 
+
++ ```
+  @Target({ElementType.TYPE})
+  @Retention(RetentionPolicy.RUNTIME)
+  @Documented
+  @Controller
+  @ResponseBody
+  public @interface RestController {
+      @AliasFor(
+          annotation = Controller.class
+      )
+      String value() default "";
+  }
+  ```
+
++ @RequestMapping：提供路由信息，告诉Spring任何来自"/"路径的HTTP请求都应该被映射到 home方法；
+
+### Spring Boot
+
++ @Value：读取application.properties里面的配置（当使用了@Value注解的类被其他类作为对象使用时，只能选择注入方式，而不能new()）；
++ @SpringBootApplication相当于
+  - @Configuration（@SpringBootConfiguration点开查看发现里面还是应用了@Configuration）
+  - @EnableAutoConfiguration
+  - @ComponentScan
 
 
-
-### 
 
 
 
