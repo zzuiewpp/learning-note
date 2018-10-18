@@ -73,6 +73,12 @@ git merge tmp
 1. 直接在GitHub或者GitLab上新建分支，本地pull到本地分支，最后checkout到工作区
 2. 本地new branches
 
+```
+git branch feat1
+git checkout feat1
+git push -u origin feat1
+```
+
 ## GitHub删除文件夹
 
 想要在GitHub上删除，但又需要保留在本地的文件夹的删除方法，以.idea为例：
@@ -128,10 +134,16 @@ git log
 git reset --soft commit-id
 #为了安全起见，暂存
 git stash
-#修改文件，push到remote，-f强制覆盖
+#修改文件，puggsh到remote，-f强制覆盖
 git push --f
 #释放暂存
 git stash pop
+```
+
+## Git不同项目设置不同的用户名和邮箱
+
+```
+
 ```
 
 
