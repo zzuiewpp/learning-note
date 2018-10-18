@@ -1,5 +1,7 @@
 # Git
 
+![image-20181018171143939](VCS.assets/image-20181018171143939.png)
+
 ## Commit message
 
 ### type
@@ -22,7 +24,7 @@ Subject是 commit 目的的简短描述，不超过50个字符
 
 ## 工作区、暂存区、本地仓库、远程仓库
 
-![Git存储分布](/Git%E5%AD%98%E5%82%A8%E5%88%86%E5%B8%83.png)
+![image-20181018170254878](VCS.assets/image-20181018170254878.png)
 
 ***版本库包含stage和master***
 
@@ -143,7 +145,11 @@ git stash pop
 ## Git不同项目设置不同的用户名和邮箱
 
 ```
-
+当前项目目录下操作
+vim .git/config
+[user]
+	name = xxx
+	email = xxx
 ```
 
 
@@ -317,8 +323,6 @@ $ arc lint                      # 检查代码的语法
 $ arc get-config                # 查看已设置过的配置
 $ arc set-config <key> <value>  # 修改配置，使用--local参数为全局配置
 ```
-
-
 
 
 
