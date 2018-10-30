@@ -30,3 +30,6 @@ docker run hello-world
 + Ctrl+p+q：退出容器，但不停止运行
 + docker stop 容器ID：停止容器运行
 + docker ps：查看与运行过的容器的状态（包含当前正在运行的和已经被关闭的）
++ docker start 容器ID或容器名
++ docker restart 容器ID或容器名
++ docker kill 容器ID或容器名：强制停止容器
