@@ -39,3 +39,32 @@ docker run hello-world
 + docker exec -it 容器ID baseShell：进入指定容器，并执行BashShell命令
 + docker attach 容器ID：重新进入指定容器
 + docker cp 容器ID:/tmp/yum.log ~/XXX：将容器中某个文件拷贝到宿主机指定目下
+
+# Docker镜像Commit
+
+HUB上pull下来的镜像，自己可以个性化配置，然后再提交成为一个新的image
+
+docker commit提交容器副本使之成为一个新的镜像
+
+```
+docker commit -m="提交说明" -a="作者" 容器ID 新的镜像名:[tag标签名]
+```
+
++ 启动Tomcat容器
+
+```
+docker run -d -p docker容器的端口号:镜像Tomcat内置端口(8080) 容器名/容器ID
+```
+
++ 提交Tomcat副本
+
+```
+docker exec -it 容器ID /bin/bash	交互启动容器
+ls -al
+cd webapps/
+rm -rf docs/	移除Tomcat中的doc文档
+dokcer commit -m="delete docs" -a="walker" 容器ID avatar/tomcat01:1.0.0
+docker run -d -p 9999:8080 avatar/tomcat01:1.0.0	启动容器副本
+#和HUB上的Tomcat对比
+```
+
