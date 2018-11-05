@@ -99,4 +99,22 @@ docker attach 容器ID	重新进入该容器
 docker run -it -v ~/宿主机文件夹:/容器文件夹 -ro imageId	表示容器只有读权限
 ```
 
-容器中该目录下只有读操作权限，数据的更新只能由宿主机完成
+容器中该目录下只有读操作权限，数据的更新只能由宿主机完成-i
+
+## Dockerfile形式添加数据卷
+
+```
+#宿主机目录下创建Dockerfile文件
+mkdir ~/myDocker
+cd myDocker
+vim Dockerfile
+
+#添加以下内容
+FROM centos
+VOLUME ["/dataVolumeContainer1", "/dataVolumeContainer2"]
+CMD echo "build new image success"
+CMD /bin/bash
+```
+
+![image-20181106005323367](docker.assets/image-20181106005323367.png)
+
