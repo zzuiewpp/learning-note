@@ -324,10 +324,56 @@ $ arc get-config                # 查看已设置过的配置
 $ arc set-config <key> <value>  # 修改配置，使用--local参数为全局配置
 ```
 
+#
 
+# Git小技巧 
 
+**git直接merge分支，commit历史会出现分叉，这种分叉再汇合的结构有时候会让人觉得混乱而难以管理，如果不希望出现分叉，可使用rebase——变基**
 
+```
+需求：B分支合并到A分支(***master和其他分支都是平等的***，可以视作A或B)
+# 保证AB都已经pull(svn中的up)
+git checkout B
+git rebase A
+git checkout A
+git merge B
+git push (A分支push)
+```
 
+# PR & MR
 
+## MR:Merge request(GitLab)
 
-# 
+### 关键词
+
++ assignee：代理人
+
+合并分支使用，将一个认知合并到另一个分支，owner审核代码，同意后merge代码，或者拒绝merge
+
+## PR:Pull request(GitHub)
+
+fork别人的仓库，clone到本地，做一些修改，完成后**发起pull request给原仓库，让对方看到你修改的内容，对方review修改的内容，如果正确的话，则merge到自己的项目中**
+
+## cherry-pick
+
+可以选择某一个分支中的一个或几个commit(s)来进行操作。例如，假设我们有个稳定版本的分支，叫v2.0，另外还有个开发版本的分支v3.0，我们不能直接把两个分支合并，这样会导致稳定版本混乱，但是又想增加一个v3.0中的功能到v2.0中，这里就可以使用cherry-pick了,其实**也就是对已经存在的commit 进行再次提交**
+
+```
+git checkout v2.0branch
+git cherry-pick v3.0的某一个commitId
+```
+
+解决冲突同一般conflicts
+
+### 命令集合
+
+- git cherry-pick <commit id>:单独合并一个提交
+- git cherry-pick  -x <commit id>：同上，不同点：保留原提交者信息。
+   **Git从1.7.2版本开始支持批量cherry-pick，就是一次可以cherry-pick一个区间的commit。** 
+- git cherry-pick <start-commit-id>..<end-commit-id>
+- git cherry-pick <start-commit-id>^..<end-commit-id>
+
+前者表示把<start-commit-id>到<end-commit-id>之间(左开右闭，不包含start-commit-id)的提交cherry-pick到当前分支；
+ 后者有"^"标志的表示把<start-commit-id>到<end-commit-id>之间(闭区间，包含start-commit-id)的提交cherry-pick到当前分支。
+ 其中，<start-commit-id>到<end-commit-id>只需要commit-id的前6位即可，并且<start-commit-id>在时间上必须早于<end-commit-id>
+***最后手动push***
